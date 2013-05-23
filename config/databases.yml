@@ -25,8 +25,8 @@ all:
     param:
       classname:  PropelPDO
       dsn:        mysql:dbname=BixGame;host=localhost
-      username:   root
-      password:   
+      username:   bixgame
+      password:   nKxp5BU7CWBZ9sCZ
       encoding:   utf8
       persistent: true
       pooling:    true

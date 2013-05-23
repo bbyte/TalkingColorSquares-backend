@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config>
+    <propel>
+        <datasources default="propel">
+            <datasource id="propel">
+                <adapter>mysql</adapter>
+                <connection>
+                    <dsn>mysql:dbname=BixGame;host=localhost</dsn>
+                    <user>bixgame</user>
+                    <password>nKxp5BU7CWBZ9sCZ</password>
+                </connection>
+            </datasource>
+        </datasources>
+    </propel>
+</config>
