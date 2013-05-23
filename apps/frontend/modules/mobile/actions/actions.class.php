@@ -43,28 +43,41 @@ class mobileActions extends sfActions
       return($this->renderText(json_encode($this->jsonData)));
     }
 
-    $device = DevicesQuery::filterByDeviceId($deviceId)->findOne();
+    $device = DevicesQuery::create()->filterByDeviceId($deviceId)->findOne();
 
     if(! $device) {
       
       $device = new Devices();
+      $device->setDeviceId($deviceId);
       $device->setDeviceType($deviceType);
       $device->setDeviceOs($deviceOs);
       $device->setDeviceToken($deviceToken);
       $device->save();
-    }
-    
-    $activity = new Activity();
-    $activity->setDevices($device);
-    $activity->setEvent("SETUP");
-    $activity->save();
 
+      $activity = new Activity();
+      $activity->setDevices($device);
+      $activity->setEvent("SETUP");
+      $activity->save();
+    } else {
+
+      $device->setDeviceId($deviceId);
+      $device->setDeviceType($deviceType);
+      $device->setDeviceOs($deviceOs);
+      $device->setDeviceToken($deviceToken);
+      $device->save();
+
+      $activity = new Activity();
+      $activity->setDevices($device);
+      $activity->setEvent("REINSTALL");
+      $activity->save();
+    } 
+    
     $this->jsonData = array("ok" => TRUE);
 
     return($this->renderText(json_encode($this->jsonData)));
   }
 
-  public functoin executeUpdate(sfWebRequest $request){
+  public function executeUpdate(sfWebRequest $request){
   
     $deviceId = $request->getParameter('deviceId');
     $event    = $request->getParameter('event');
@@ -75,7 +88,7 @@ class mobileActions extends sfActions
       return($this->renderText(json_encode($this->jsonData)));
     }
 
-    $device = DevicesQuery::filterByDeviceId($deviceId)->findOne();
+    $device = DevicesQuery::create()->filterByDeviceId($deviceId)->findOne();
 
     if(! $device){
 
