@@ -1,0 +1,54 @@
+propel:
+  devices:
+    _propel_behaviors:
+      timestampable:
+        name: timestamp
+
+    id:
+      type: INTEGER
+      required: TRUE
+      autoIncrement: TRUE
+      primaryKey: TRUE
+
+    device_id:
+      type: VARCHAR
+      size: 255
+      required: TRUE
+      unique: TRUE
+
+    device_token:
+      type: VARCHAR
+      size: 255
+
+    device_type:
+      type: VARCHAR
+      size: 255
+
+    device_os:
+      type: VARCHAR
+      size: 255
+
+  activity:
+    _propel_behaviors:
+      timestampable:
+        name: timestamp
+
+    id:
+      type: INTEGER
+      required: TRUE
+      autoIncrement: TRUE
+      primaryKey: TRUE
+
+    device_id:
+      type: INTEGER
+      foreignTable: devices
+      foreignReference: id
+      required: TRUE
+      onDelete: CASCADE
+
+    event:
+      type: VARCHAR
+      size: 255
+      required: TRUE
+
+

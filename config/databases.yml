@@ -24,7 +24,7 @@ all:
     class:        sfPropelDatabase
     param:
       classname:  PropelPDO
-      dsn:        mysql:dbname=BixGame;host=localhost
+      dsn:        mysql:dbname=projects_bixgame;host=localhost
       username:   bixgame
       password:   nKxp5BU7CWBZ9sCZ
       encoding:   utf8
