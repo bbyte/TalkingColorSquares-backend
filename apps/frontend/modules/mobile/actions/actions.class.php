@@ -10,11 +10,11 @@
  */
 class mobileActions extends sfActions
 {
- /**
-  * Executes index action
-  *
-  * @param sfRequest $request A request object
-  */
+  /**
+   * Executes index action
+   *
+   * @param sfRequest $request A request object
+   */
 
   public $jsonData = array();
 
@@ -23,6 +23,7 @@ class mobileActions extends sfActions
     // always talk as json
 
     $this->getResponse()->setContentType('application/json');
+
   }
 
   public function executeIndex(sfWebRequest $request)
@@ -46,7 +47,7 @@ class mobileActions extends sfActions
     $device = DevicesQuery::create()->filterByDeviceId($deviceId)->findOne();
 
     if(! $device) {
-      
+
       $device = new Devices();
       $device->setDeviceType($deviceType);
       $device->setDeviceOs($deviceOs);
@@ -71,7 +72,7 @@ class mobileActions extends sfActions
       $activity->setIp($_SERVER['REMOTE_ADDR']);
       $activity->save();
     }
-    
+
 
     $this->jsonData = array("ok" => TRUE);
 
@@ -79,7 +80,7 @@ class mobileActions extends sfActions
   }
 
   public function executeUpdate(sfWebRequest $request){
-  
+
     $deviceId = $request->getParameter('deviceId');
     $event    = $request->getParameter('event');
 
