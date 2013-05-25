@@ -52,6 +52,7 @@ class mobileActions extends sfActions
       $device->setDeviceType($deviceType);
       $device->setDeviceOs($deviceOs);
       $device->setDeviceToken($deviceToken);
+      $device->setDeviceId($deviceId);
       $device->save();
 
       $activity = new Activity();
@@ -64,6 +65,7 @@ class mobileActions extends sfActions
       $device->setDeviceType($deviceType);
       $device->setDeviceOs($deviceOs);
       $device->setDeviceToken($deviceToken);
+      $device->setDeviceId($deviceId);
       $device->save();
 
       $activity = new Activity();
