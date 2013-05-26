@@ -23,7 +23,6 @@ class mobileActions extends sfActions
     // always talk as json
 
     $this->getResponse()->setContentType('application/json');
-
   }
 
   public function executeIndex(sfWebRequest $request)
@@ -36,7 +35,6 @@ class mobileActions extends sfActions
     $deviceId     = $request->getParameter('deviceId');
     $deviceType   = $request->getParameter('deviceType');
     $deviceOs     = $request->getParameter('deviceOs');
-    $deviceToken  = $request->getParameter('deviceToken');
 
     if(! $deviceId || ! $deviceType || ! $deviceOs){
 
@@ -51,7 +49,6 @@ class mobileActions extends sfActions
       $device = new Devices();
       $device->setDeviceType($deviceType);
       $device->setDeviceOs($deviceOs);
-      $device->setDeviceToken($deviceToken);
       $device->setDeviceId($deviceId);
       $device->save();
 
@@ -74,7 +71,6 @@ class mobileActions extends sfActions
       $activity->setIp($_SERVER['REMOTE_ADDR']);
       $activity->save();
     }
-
 
     $this->jsonData = array("ok" => TRUE);
 
@@ -106,6 +102,30 @@ class mobileActions extends sfActions
     $activity->setEvent($event);
     $activity->setIp($_SERVER['REMOTE_ADDR']);
     $activity->save();
+
+    $this->jsonData = array("ok" => TRUE);
+
+    return($this->renderText(json_encode($this->jsonData)));
+  }
+
+  public function executeSetToken(sfWebRequest $request){
+
+    $deviceId = $request->getParameter('deviceId');
+    $deviceToken = $request->getParameter('deviceToken');
+
+    if(! $deviceId || ! $deviceToken){
+
+      $this->jsonData = array("message" => "Missing deviceid or devicetoken!!!");
+      return($this->renderText(json_encode($this->jsonData)));
+    }
+
+    $device = DevicesQuery::create()->filterByDeviceId($deviceId)->findOne();
+
+    if($device) {
+
+      $device->setDeviceToken($deviceToken);
+      $device->save();
+    }
 
     $this->jsonData = array("ok" => TRUE);
 
