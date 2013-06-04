@@ -35,13 +35,23 @@ class statisticsActions extends sfActions
                                           ->filterByEvent('STARTED')
                                           ->groupBy('Activity.DeviceId')
                                           ->having('COUNT(*) > 1', 1)
-                                          ->find();
+                                          ->find()->count();
     $this->returnedUsersToday = ActivityQuery::create()
                                           ->withColumn('COUNT(Activity.Id)', 'count')
                                           ->filterByCreatedAt(array('min' => time() - 24 * 60 * 60))
                                           ->filterByEvent('STARTED')
                                           ->groupBy('Activity.DeviceId')
                                           ->having('COUNT(*) > 1', 1)
-                                          ->find();
+                                          ->find()->count();
+    $this->disabledPushNotifications = DevicesQuery::create()->filterByDeviceToken(NULL)->find()->count();
+    $this->iPads = DevicesQuery::create()->filterByDeviceType("iPad")->find()->count();
+    $this->iPhones = DevicesQuery::create()->filterByDeviceType("iPhone")->find()->count();
   }
+
+  public function executeDevices(sfWebRequest $request)
+  {
+    $this->devices = DevicesQuery::create()->find();
+    $this->setupActivities = ActivityQuery::create()->filterByEvent('SETUP')->find();
+  }
+
 }
