@@ -10,11 +10,11 @@
  */
 class mobileActions extends sfActions
 {
- /**
-  * Executes index action
-  *
-  * @param sfRequest $request A request object
-  */
+  /**
+   * Executes index action
+   *
+   * @param sfRequest $request A request object
+   */
 
   public $jsonData = array();
 
@@ -35,7 +35,6 @@ class mobileActions extends sfActions
     $deviceId     = $request->getParameter('deviceId');
     $deviceType   = $request->getParameter('deviceType');
     $deviceOs     = $request->getParameter('deviceOs');
-    $deviceToken  = $request->getParameter('deviceToken');
 
     if(! $deviceId || ! $deviceType || ! $deviceOs){
 
@@ -46,39 +45,40 @@ class mobileActions extends sfActions
     $device = DevicesQuery::create()->filterByDeviceId($deviceId)->findOne();
 
     if(! $device) {
-      
+
       $device = new Devices();
-      $device->setDeviceId($deviceId);
       $device->setDeviceType($deviceType);
       $device->setDeviceOs($deviceOs);
-      $device->setDeviceToken($deviceToken);
+      $device->setDeviceId($deviceId);
       $device->save();
 
       $activity = new Activity();
       $activity->setDevices($device);
       $activity->setEvent("SETUP");
+      $activity->setIp($_SERVER['REMOTE_ADDR']);
       $activity->save();
     } else {
 
-      $device->setDeviceId($deviceId);
       $device->setDeviceType($deviceType);
       $device->setDeviceOs($deviceOs);
       $device->setDeviceToken($deviceToken);
+      $device->setDeviceId($deviceId);
       $device->save();
 
       $activity = new Activity();
       $activity->setDevices($device);
-      $activity->setEvent("REINSTALL");
+      $activity->setEvent("SETUP");
+      $activity->setIp($_SERVER['REMOTE_ADDR']);
       $activity->save();
-    } 
-    
+    }
+
     $this->jsonData = array("ok" => TRUE);
 
     return($this->renderText(json_encode($this->jsonData)));
   }
 
   public function executeUpdate(sfWebRequest $request){
-  
+
     $deviceId = $request->getParameter('deviceId');
     $event    = $request->getParameter('event');
 
@@ -90,6 +90,7 @@ class mobileActions extends sfActions
 
     $device = DevicesQuery::create()->filterByDeviceId($deviceId)->findOne();
 
+
     if(! $device){
 
       $this->jsonData = array("message" => "No such device: ".$deviceId." !!!");
@@ -99,7 +100,32 @@ class mobileActions extends sfActions
     $activity = new Activity();
     $activity->setDevices($device);
     $activity->setEvent($event);
+    $activity->setIp($_SERVER['REMOTE_ADDR']);
     $activity->save();
+
+    $this->jsonData = array("ok" => TRUE);
+
+    return($this->renderText(json_encode($this->jsonData)));
+  }
+
+  public function executeSetToken(sfWebRequest $request){
+
+    $deviceId = $request->getParameter('deviceId');
+    $deviceToken = $request->getParameter('deviceToken');
+
+    if(! $deviceId || ! $deviceToken){
+
+      $this->jsonData = array("message" => "Missing deviceid or devicetoken!!!");
+      return($this->renderText(json_encode($this->jsonData)));
+    }
+
+    $device = DevicesQuery::create()->filterByDeviceId($deviceId)->findOne();
+
+    if($device) {
+
+      $device->setDeviceToken($deviceToken);
+      $device->save();
+    }
 
     $this->jsonData = array("ok" => TRUE);
 
