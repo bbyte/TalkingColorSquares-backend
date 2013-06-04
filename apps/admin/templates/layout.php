@@ -9,6 +9,10 @@
     <?php include_javascripts() ?>
   </head>
   <body>
+
+    <?php echo link_to("Simple statistics", "statistics/index") ?>&nbsp;&nbsp;
+    <?php echo link_to("Devices list", "statistics/devices") ?>
+    <br/><hr/><br/>
     <?php echo $sf_content ?>
   </body>
 </html>
