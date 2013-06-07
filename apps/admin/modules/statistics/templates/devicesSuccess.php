@@ -14,28 +14,30 @@ $gi = geoip_open("../GeoLiteCity.dat",GEOIP_STANDARD);
 //echo "</pre>";
 ?>
 
-<table>
+<table width="100%">
   <tr>
     <td>Device ID</td>
     <td>Device type</td>
     <td>Devce OS version</td>
     <td>Time</td>
-    <td>City,Contry</td>
+    <td>City</td>
+    <td>Contry</td>
     <td>IP address</td>
-    <td>Number of starts</td>
-    <td>Total time in app</td>
+    <td>Sessions</td>
+    <td>Time in app</td>
+    <td>Actition</td>
   </tr>
-  <tr><td colspan="8"><hr></td> </tr>
+  <tr><td colspan="10"><hr></td> </tr>
   <?php foreach ($setupActivities as $setupActivity): ?>
     <?php $device = $setupActivity->getDevices() ?>
+    <?php $geoipRecord = geoip_record_by_addr($gi, $setupActivity->getIp()) ?>
     <tr>
       <td><?php echo $device->getId() ?></td>
       <td><?php echo $device->getDeviceType() ?></td>
       <td><?php echo $device->getDeviceOs() ?></td>
       <td><?php echo $device->getCreatedAt() ?></td>
-      <?php $geoipRecord = geoip_record_by_addr($gi, $setupActivity->getIp()) ?>
-
-      <td><?php echo $geoipRecord->city . ", " . $geoipRecord->country_name ?></td>
+      <td><?php echo $geoipRecord->city ?></td>
+      <td><?php echo $geoipRecord->country_name ?></td>
       <td><?php echo $setupActivity->getIp() ?></td>
       <td>
         <?php echo ActivityQuery::create()
@@ -52,6 +54,8 @@ $gi = geoip_open("../GeoLiteCity.dat",GEOIP_STANDARD);
 
           $data = $times[$device->getId()]->getRawValue();
 
+//        var_dump($data);
+
           for ($i = (count($data) - 1); $i >= 0; $i--) {
             $sessionTime = 0;
             $index = (! (count($data[$i])) ? 0 : (count($data[$i]) - 1));
@@ -65,7 +69,10 @@ $gi = geoip_open("../GeoLiteCity.dat",GEOIP_STANDARD);
           }
 
         ?>
-        <?php echo $time ?>
+        <?php echo gmdate("i \m\i\\n\s s \s\e\c\s", $time) ?>
+      </td>
+      <td>
+        <?php echo link_to("Full log", "statistics/activityDetails?deviceId=".$device->getId()) ?>
       </td>
     </tr>
 

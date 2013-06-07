@@ -46,6 +46,7 @@ class statisticsActions extends sfActions
     $this->disabledPushNotifications = DevicesQuery::create()->filterByDeviceToken(NULL)->find()->count();
     $this->iPads = DevicesQuery::create()->filterByDeviceType("iPad")->find()->count();
     $this->iPhones = DevicesQuery::create()->filterByDeviceType("iPhone")->find()->count();
+    $this->iPods = DevicesQuery::create()->filterByDeviceType("iPod touch")->find()->count();
   }
 
   public function executeDevices(sfWebRequest $request)
@@ -57,6 +58,9 @@ class statisticsActions extends sfActions
 //                                     ->where('Activity.Event = ?', 'STARTED')
 //                                     ->_or()
 //                                     ->where('Activity.Event = ?', 'RESUMED')
+//                                     ->filterByDeviceId(20)
+                                     ->where('Activity.Event != ?', 'SETUP')
+                                     ->where('Activity.Event != ?', 'SUSPENDED')
 //                                     ->orderByDeviceId()
                                      ->orderByCreatedAt()
                                      ->find();
@@ -88,37 +92,60 @@ class statisticsActions extends sfActions
 //        $times[$currentDeviceId] = array(array());
 //      }
 
-      $index = ((count($times[$currentDeviceId]) == 0) ? 0 : (count($times[$currentDeviceId]) - 1));
+//      $index = ((count($times[$currentDeviceId]) == 0) ? 0 : (count($times[$currentDeviceId]) - 1));
 
+        $index = count($times[$currentDeviceId]);
 //      var_dump($currentDeviceId);
-//      var_dump($index);
+//      echo "Index: ";var_dump($index);
 //      var_dump($times[$currentDeviceId]);
 //      var_dump($activity->getCreatedAt());
 //      var_dump($currentDeviceId);
 //      var_dump($previousDeviceId);
 //      echo ("----\n");
-      if ($currentDeviceId != $previousDeviceId)
+      if ($currentDeviceId == $previousDeviceId && $index > 0 && $activity->getEvent() != "STARTED" && $activity->getEvent() != "RESUMED")
+//      if ($activity->getEvent() != "STARTED" && $index > 0)
       {
 //        $index = count($times[$currentDeviceId]);
 //        $times[$currentDeviceId][$index] = array();
 //        array_push($times[$currentDeviceId], array());
-        $index++;
+        $index--;
+//        echo("New index:"); var_dump($index);
+      } else if($index == 0) {
+//        $index++;
+//        var_dump($currentDeviceId);
+//        var_dump($previousDeviceId);
+//        var_dump($index);
       }
 
       if(! isset($times[$currentDeviceId][$index])){
         $times[$currentDeviceId][$index] = array();
       }
 
-      array_push($times[$currentDeviceId][$index], strtotime($activity->getCreatedAt()));
-
+//      array_push($times[$currentDeviceId][$index], strtotime($activity->getCreatedAt()));
+      $times[$currentDeviceId][$index][] = strtotime($activity->getCreatedAt());
+//      var_dump($times[$currentDeviceId]);
       $previousDeviceId = $currentDeviceId;
 //      var_dump($previousDeviceId);
 //      var_dump($currentDeviceId);
 //      echo ("====\n");
     }
 
+//    var_dump($times);
+
 //    die();
     $this->times = $times;
+  }
+
+  public function executeActivityDetails(sfWebRequest $request)
+  {
+    $deviceId = $request->getParameter("deviceId");
+
+    $this->deviceActivities = ActivityQuery::create()->findByDeviceId($deviceId);
+  }
+
+  private function getSessionActivities()
+  {
+
   }
 
 }

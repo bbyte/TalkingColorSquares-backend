@@ -7,5 +7,6 @@ Returned users: <?php echo $returnedUsers ?><br/>
 Returned users last 24h: <?php echo $returnedUsersToday ?><br/>
 Disabled push notifications: <?php echo $disabledPushNotifications ?><br/>
 iPads: <?php echo $iPads ?><br/>
-iPhones: <?php echo $iPhones ?>
+iPhones: <?php echo $iPhones ?><br/>
+iPods: <?php echo $iPods ?><br/>
 

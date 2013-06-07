@@ -7,6 +7,12 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <?php include_stylesheets() ?>
     <?php include_javascripts() ?>
+    <style>
+      tr:hover {
+        background-color: #ff0000;
+        color: #000000;
+      }
+    </style>
   </head>
   <body>
 
