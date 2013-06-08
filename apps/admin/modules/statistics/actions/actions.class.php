@@ -47,23 +47,118 @@ class statisticsActions extends sfActions
     $this->iPads = DevicesQuery::create()->filterByDeviceType("iPad")->find()->count();
     $this->iPhones = DevicesQuery::create()->filterByDeviceType("iPhone")->find()->count();
     $this->iPods = DevicesQuery::create()->filterByDeviceType("iPod touch")->find()->count();
+
+    $this->total50SecDevices = 0;
+    $this->total60SecDevices = 0;
+    $this->total50SecDevicesWithMoreThan1Session = 0;
+    $this->total60SecDevicesWithMoreThan1Session = 0;
+
+    $times = $this->getSessionActivities();
+
+    foreach($times as $data)
+    {
+      $time = 0;
+
+      for ($i = (count($data) - 1); $i >= 0; $i--) {
+        $sessionTime = 0;
+        $index = (! (count($data[$i])) ? 0 : (count($data[$i]) - 1));
+        $sessionTime = $data[$i][$index] - $data[$i][0];
+
+        $time += $sessionTime;
+
+        if ($sessionTime > 50 || $sessionTime > 60)
+        {
+          if ($sessionTime > 50)
+          {
+            $this->total50SecDevices++;
+            if (count(data) > 1)
+            {
+              $this->total50SecDevicesWithMoreThan1Session++;
+            }
+          }
+          if ($sessionTime > 60)
+          {
+            $this->total60SecDevices++;
+            if (count(data) > 1)
+            {
+              $this->total60SecDevicesWithMoreThan1Session++;
+            }
+          }
+          continue;
+        }
+      }
+    }
   }
 
   public function executeDevices(sfWebRequest $request)
   {
+    $csv = $request->getParameter('csv');
     $this->devices = DevicesQuery::create()->find();
     $this->setupActivities = ActivityQuery::create()->filterByEvent('SETUP')->find();
+    $this->times = $this->getSessionActivities();
 
+    if ($csv)
+    {
+      include_once("../vendor/geoip/geoip/geoip.inc");
+      include_once("../vendor/geoip/geoip/geoipcity.inc");
+      $gi = geoip_open("../GeoLiteCity.dat",GEOIP_STANDARD);
+
+      $csvHeader = "deviceID,deviceType,deviceOS,installTime,City,Country,ipAddress,Sessions,TimeInApp";
+      $csvData = "";
+      foreach ($this->setupActivities as $setupActivity)
+      {
+        $device = $setupActivity->getDevices();
+        $data = $this->times[$device->getId()];
+        $time = 0;
+
+        $geoipRecord = geoip_record_by_addr($gi, $setupActivity->getIp());
+
+        for ($i = (count($data) - 1); $i >= 0; $i--)
+        {
+          $sessionTime = 0;
+          $index = (! (count($data[$i])) ? 0 : (count($data[$i]) - 1));
+          $sessionTime = $data[$i][$index] - $data[$i][0];
+
+          $time += $sessionTime;
+        }
+
+        $sessions = ActivityQuery::create()
+          ->filterByEvent('STARTED')
+          ->filterByDeviceId($device->getId())
+          ->find()->count();
+        $csvData .= sprintf("%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+          $device->getId(), $device->getDeviceType(), $device->getDeviceOs(), $device->getCreatedAt(), $geoipRecord->city, $geoipRecord->country_name, $setupActivity->getIp(), $sessions, $time);
+      }
+      $this->getResponse()->setHttpHeader("Pragma", "public");
+      $this->getResponse()->setHttpHeader("Expires", "0");
+      $this->getResponse()->setHttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
+      $this->getResponse()->setHttpHeader("Cache-Control", "private");
+      $this->getResponse()->setHttpHeader("Content-Type", "application/octet-stream");
+      $this->getResponse()->setHttpHeader("Content-Disposition", "attachment; filename=\"deviceStatistics.csv\";");
+      $this->getResponse()->setHttpHeader("Content-Transfer-Encoding", "binary");
+      return($this->renderText("$csvHeader\n$csvData\n"));
+    }
+  }
+
+  public function executeActivityDetails(sfWebRequest $request)
+  {
+    $deviceId = $request->getParameter("deviceId");
+
+    $this->deviceActivities = ActivityQuery::create()->findByDeviceId($deviceId);
+  }
+
+  private function getSessionActivities()
+  {
     $activities = ActivityQuery::create()
 //                                     ->where('Activity.Event = ?', 'STARTED')
 //                                     ->_or()
 //                                     ->where('Activity.Event = ?', 'RESUMED')
 //                                     ->filterByDeviceId(20)
-                                     ->where('Activity.Event != ?', 'SETUP')
-                                     ->where('Activity.Event != ?', 'SUSPENDED')
+      ->where('Activity.Event != ?', 'SETUP')
+      ->where('Activity.Event != ?', 'SUSPENDED')
 //                                     ->orderByDeviceId()
-                                     ->orderByCreatedAt()
-                                     ->find();
+      ->orderByCreatedAt()
+      ->find();
 
 
     $times = array();
@@ -83,69 +178,22 @@ class statisticsActions extends sfActions
         $times[$currentDeviceId] = array();
       }
 
-//      else  if ($activity->getEvent() == "STARTED")
-//      {
-//        $times[$currentDeviceId] = array(array());
-//      } else if(!count($times[$currentDeviceId] ))
-//      {
-////        var_dump("dsfsdfdsf");
-//        $times[$currentDeviceId] = array(array());
-//      }
-
-//      $index = ((count($times[$currentDeviceId]) == 0) ? 0 : (count($times[$currentDeviceId]) - 1));
-
-        $index = count($times[$currentDeviceId]);
-//      var_dump($currentDeviceId);
-//      echo "Index: ";var_dump($index);
-//      var_dump($times[$currentDeviceId]);
-//      var_dump($activity->getCreatedAt());
-//      var_dump($currentDeviceId);
-//      var_dump($previousDeviceId);
-//      echo ("----\n");
+      $index = count($times[$currentDeviceId]);
       if ($currentDeviceId == $previousDeviceId && $index > 0 && $activity->getEvent() != "STARTED" && $activity->getEvent() != "RESUMED")
-//      if ($activity->getEvent() != "STARTED" && $index > 0)
       {
-//        $index = count($times[$currentDeviceId]);
-//        $times[$currentDeviceId][$index] = array();
-//        array_push($times[$currentDeviceId], array());
         $index--;
-//        echo("New index:"); var_dump($index);
       } else if($index == 0) {
-//        $index++;
-//        var_dump($currentDeviceId);
-//        var_dump($previousDeviceId);
-//        var_dump($index);
       }
 
       if(! isset($times[$currentDeviceId][$index])){
         $times[$currentDeviceId][$index] = array();
       }
 
-//      array_push($times[$currentDeviceId][$index], strtotime($activity->getCreatedAt()));
       $times[$currentDeviceId][$index][] = strtotime($activity->getCreatedAt());
-//      var_dump($times[$currentDeviceId]);
       $previousDeviceId = $currentDeviceId;
-//      var_dump($previousDeviceId);
-//      var_dump($currentDeviceId);
-//      echo ("====\n");
     }
 
-//    var_dump($times);
-
-//    die();
-    $this->times = $times;
-  }
-
-  public function executeActivityDetails(sfWebRequest $request)
-  {
-    $deviceId = $request->getParameter("deviceId");
-
-    $this->deviceActivities = ActivityQuery::create()->findByDeviceId($deviceId);
-  }
-
-  private function getSessionActivities()
-  {
-
+    return($times);
   }
 
 }

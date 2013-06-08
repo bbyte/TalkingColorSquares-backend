@@ -14,6 +14,8 @@ $gi = geoip_open("../GeoLiteCity.dat",GEOIP_STANDARD);
 //echo "</pre>";
 ?>
 
+<?php echo link_to("Export to CSV", "statistics/devices?csv=1") ?><br/><br/>
+
 <table width="100%">
   <tr>
     <td>Device ID</td>

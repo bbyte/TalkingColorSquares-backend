@@ -9,7 +9,7 @@
     <?php include_javascripts() ?>
     <style>
       tr:hover {
-        background-color: #ff0000;
+        background-color: #DDDAE5;
         color: #000000;
       }
     </style>
