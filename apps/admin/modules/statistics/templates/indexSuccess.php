@@ -10,13 +10,13 @@
   <tr><td>iPads:</td><td><?php echo $iPads ?></td></tr>
   <tr><td>iPhones:</td><td><?php echo $iPhones ?></td></tr>
   <tr><td>iPods:</td><td><?php echo $iPods ?></td></tr>
-  <tr><td>Users with atleast one session > 50 sec </td><td><?php echo $total50SecDevices ?></td></tr>
-  <tr><td>Users with atleast one session > 60 sec </td><td><?php echo $total60SecDevices ?></td></tr>
+  <tr><td>Users with atleast one session > 50 sec: </td><td><?php echo $total50SecDevices ?></td></tr>
+  <tr><td>Users with atleast one session > 60 sec: </td><td><?php echo $total60SecDevices ?></td></tr>
 <!--  <tr><td>Users with more than one session and atleast one > 60 sec </td><td>--><?php //echo $total60SecDevicesWithMoreThan1Session ?><!--</td></tr>-->
 <!--  <tr><td>Users with more than one session and atleast one > 50 sec </td><td>--><?php //echo $total50SecDevicesWithMoreThan1Session ?><!--</td></tr>-->
-  <tr><td></td><td></td></tr>
-  <tr><td></td><td></td></tr>
-  <tr><td></td><td></td></tr>
+  <tr><td>Paid users: </td><td><?php echo $paidUsersCount ?></td></tr>
+  <tr><td>Paid cancel users: </td><td><?php echo $paidCancelUsersCount ?></td></tr>
+  <tr><td>Number of users clicked on MORE NUMBERS: </td><td><?php echo $moreNumbersCount ?></td></tr>
   <tr><td></td><td></td></tr>
   <tr><td></td><td></td></tr>
   <tr><td></td><td></td></tr>

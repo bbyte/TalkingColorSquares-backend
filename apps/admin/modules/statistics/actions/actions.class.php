@@ -88,6 +88,25 @@ class statisticsActions extends sfActions
         }
       }
     }
+
+    $this->paidUsersCount = ActivityQuery::create()
+                                                ->filterByEvent("PAID_OK")
+                                                ->groupBy('Activity.DeviceId')
+                                                ->find()->count();
+
+    $this->paidCancelUsersCount = ActivityQuery::create()
+                                                ->filterByEvent("PAID_CANCEL")
+//                                                ->withColumn('COUNT(Activity.Id)', 'count')
+//                                                ->filterByEvent('STARTED')
+                                                ->groupBy('Activity.DeviceId')
+//                                                ->having('COUNT(*) > 1', 1)
+                                                ->find()->count();
+
+
+    $this->moreNumbersCount = ActivityQuery::create()
+                                                ->filterByEvent("MORE_NUMBERS")
+                                                ->groupBy('Activity.DeviceId')
+                                                ->find()->count();
   }
 
   public function executeDevices(sfWebRequest $request)

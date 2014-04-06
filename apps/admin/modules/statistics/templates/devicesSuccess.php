@@ -53,7 +53,7 @@ $gi = geoip_open("../GeoLiteCity.dat",GEOIP_STANDARD);
       <td>
         <?php
           $time = 0;
-
+          if (! $times[$device->getId()]) continue;
           $data = $times[$device->getId()]->getRawValue();
 
 //        var_dump($data);
